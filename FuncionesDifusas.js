@@ -53,3 +53,10 @@
   }
 
 
+// Predicción
+// Reglas:
+// Después de un período de buen tiempo, si la temperatura y la humedad relativa del aire van en aumento, mientras el barómetro sigue estacionario, pueden esperarse tormentas de calor, sobre todo en los meses con más horas de sol, de mayo a septiembre.
+// Si la presión atmosférica es alta y permanece así, sin cambios, con la temperatura y humedad bajas, el tiempo debe seguir estable. Seguramente, estemos bajo el dominio de un anticiclón persistente invernal.
+// Cuando la presión atmosférica permanece baja, después de varios días en esos valores, en un ambiente inestable, con temperatura templada o baja más una humedad relativa baja, no hay que esperar que las lluvias o las nevadas cesen a corto plazo.
+// En el caso de observar una presión atmosférica al alza, pese a que el tiempo esté inestable en ese momento, es de esperar una mejoría del tiempo, al menos transitoria: podría acercarse alguna cuña anticiclónica que dominara la zona de manera temporal entre frente y frente o borrasca y borrasca, o bien el asentamiento durante un plazo más largo de un anticiclón.
+// Si tras muchos días de tiempo estable y presión alta, se inician varias jornadas de presión en descenso, es bastante probable que la inestabilidad aparezca en breve.
