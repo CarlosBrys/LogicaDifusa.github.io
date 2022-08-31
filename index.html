@@ -1,0 +1,206 @@
+
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>Información Mateorológica Caracterizada con Lógica Difusa</title>
+
+<link type="text/css" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.8.0/leaflet.css" />
+<style>
+  html,
+  body {
+      width: 100%;
+      height: 100%;
+      margin: 0;
+      padding: 0;
+  }
+
+  #map {
+      height: 100%;
+      width: 100vw;
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      right: 0;
+      left: 0;
+  }
+</style>
+
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.8.0/leaflet.js"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.1/jquery.min.js"></script>
+
+
+<script type="text/javascript" src="https://cdn.rawgit.com/CarlosBrys/LogicaDifusa/main/FuncionesDifusas.js"></script>
+
+
+</head>
+
+
+<body>
+
+
+<div id="map" class="map"></div>
+
+
+<script>
+
+// Interface basada en: https://gis.stackexchange.com/questions/313430/
+
+// Misiones
+var latitud = -26.883;
+var longitud = -54.437;
+var zoom = 8;
+var mymap = L.map('map', {
+    center: [-26.883, -54.437],
+    zoom: zoom,
+    zoomControl: true,
+});
+
+//Mapa base
+var osm = L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png',
+{
+    attribution: '&copy; Colaboradores de <a href="http://osm.org/copyright" target = "_blank">OpenStreetMap</a>'
+}).addTo(mymap);
+
+
+
+var popup = L.popup();
+
+//popup function
+function onMapClick(e) {
+    popup
+        .setLatLng(e.latlng)
+        .setContent("Usted hizo clic en el mapa en " + e.latlng.toString()) 
+        .openOn(mymap);
+
+
+//getting json function
+$(document).ready(function(){
+  $.ajax({
+    url: "https://api.openweathermap.org/data/2.5/weather?lat=" + e.latlng.lat + '&lon=' + e.latlng.lng + '&lang=es' +"&appid=32a020e350d198b03a3acfbcdd355310",
+    dataType: 'json',
+    success: function(data) {
+      // almacena los datos en variables json
+      weatherlocation_lon = data.coord.lon; // lon WGS84
+      weatherlocation_lat = data.coord.lat; // lat WGS84
+      weatherstationname = data.name // Name of Weatherstation
+      weatherstationid = data.id // ID of Weatherstation
+      weathertime = data.dt // Time of weatherdata (UTC)
+      temperatura = data.main.temp; // Kelvin
+      presion = data.main.pressure; // hPa
+      humedad = data.main.humidity; // %
+      temperatura_min = data.main.temp_min; // Kelvin
+      temperatura_max = data.main.temp_max; // Kelvin
+      velocidadViento = data.wind.speed; // Meter per second
+      direccionViento = data.wind.deg; // Wind from direction x degree from north
+      nubosidad = data.clouds.all; // nubosidad in %
+      weatherconditionid = data.weather[0].id // ID
+      weatherconditionstring = data.weather[0].main // Weatheartype
+      descripcionClima = data.weather[0].description // Weatherdescription
+      weatherconditionicon = data.weather[0].icon // ID of weathericon
+
+    // Convierte el tiempo Unix UTC
+    var utctimecalc = new Date(weathertime * 1000);
+    var months = ['01','02','03','04','05','06','07','08','09','10','11','12'];
+    var year = utctimecalc.getFullYear();
+    var month = months[utctimecalc.getMonth()];
+    var date = utctimecalc.getDate();
+    var hour = utctimecalc.getHours();
+    var min = utctimecalc.getMinutes();
+    var sec = utctimecalc.getSeconds();
+    var time = date + '.' + month + '.' + year + ' ' + hour + ':' + min + ' Uhr';
+
+    
+
+    // recálculo
+    var weathercondtioniconhtml = "http://openweathermap.org/img/w/" + weatherconditionicon + ".png";
+    var weathertimenormal = time; // reallocate time var....
+    var temperaturacelsius = Math.round((temperatura - 273) * 100) / 100;  // Converting Kelvin to Celsius
+    var velocidadVientoNudos = Math.round((velocidadViento * 1.94) * 100) / 100; // velocidadViento from m/s in Knots; Round to 2 decimals
+    var velocidadVientoKmh = Math.round((velocidadViento * 3.6) * 100) / 100; // velocidadViento from m/s in km/h; Round to 2 decimals
+    var direccionVientostring = "Im the wind from direction"; // Wind from direction x as text
+    if (direccionViento > 348.75 &&  direccionViento <= 11.25) {
+        direccionVientostring =  "N";
+    } else if (direccionViento > 11.25 &&  direccionViento <= 33.75) {
+        direccionVientostring =  "NNE";
+    } else if (direccionViento > 33.75 &&  direccionViento <= 56.25) {
+        direccionVientostring =  "NE";
+    } else if (direccionViento > 56.25 &&  direccionViento <= 78.75) {
+        direccionVientostring =  "ENE";
+    } else if (direccionViento > 78.75 &&  direccionViento <= 101.25) {
+        direccionVientostring =  "E";
+    } else if (direccionViento > 101.25 &&  direccionViento <= 123.75) {
+        direccionVientostring =  "ESE";
+    } else if (direccionViento > 123.75 &&  direccionViento <= 146.25) {
+        direccionVientostring =  "SE";
+    } else if (direccionViento > 146.25 &&  direccionViento <= 168.75) {
+        direccionVientostring =  "SSE";
+    } else if (direccionViento > 168.75 &&  direccionViento <= 191.25) {
+        direccionVientostring =  "S";
+    } else if (direccionViento > 191.25 &&  direccionViento <= 213.75) {
+        direccionVientostring =  "SSO";
+    } else if (direccionViento > 213.75 &&  direccionViento <= 236.25) {
+        direccionVientostring =  "SO";
+    } else if (direccionViento > 236.25 &&  direccionViento <= 258.75) {
+        direccionVientostring =  "OSO";
+    } else if (direccionViento > 258.75 &&  direccionViento <= 281.25) {
+        direccionVientostring =  "O";
+    } else if (direccionViento > 281.25 &&  direccionViento <= 303.75) {
+        direccionVientostring =  "ONO";
+    } else if (direccionViento > 303.75 &&  direccionViento <= 326.25) {
+        direccionVientostring =  "NO";
+    } else if (direccionViento > 326.25 &&  direccionViento <= 348.75) {
+        direccionVientostring =  "NNO";
+    } else {
+        direccionVientostring =  " - currently no winddata available - ";
+    };
+
+
+  ///////////////////////////////////////////////////////
+  // Funciones difusas para las etiquetas linguisticas //
+  ///////////////////////////////////////////////////////
+      TextoTemperatura = EtiquetaTemperatura(temperaturacelsius);
+      // TextoTemperatura = EtiquetaHumedad(humedad);
+      // TextoPresion = EtiquetaPresion(presion);
+      // TextoViento = EtiquetaViento(velocidadViento);
+      // TextoTemperatura = EtiquetaTemperatura(temperaturacelsius);
+      // TextoTemperatura = EtiquetaTemperatura(temperaturacelsius);
+
+      
+
+//Popup with content
+    var fontsizesmall = 1;
+    popup.setContent("Datos del Tiempo:<br>" + "<img src=" + weathercondtioniconhtml + "><br>" +
+     descripcionClima + "<br>" +
+     "Temperatura: " + temperaturacelsius + "°C" + "<b> [ " + TextoTemperatura + " ]</b><br>" +
+     "Presión: " + presion + " hPa" + "<br>" +
+     "Humedad: " + humedad + "%" + "<br>" +
+     "Nubosidad: " + nubosidad + "%" + "<br>" +
+     "Velocidad del viento: " + velocidadVientoKmh + " Km/h" + "<br>" +
+     "Vientos desde el: " + direccionVientostring + " (" + direccionViento + "°)" + "<br>" +
+     "<font size=" + fontsizesmall + ">Datos de:<br>openweathermap.org<br>Medidos el: " + weathertimenormal + "<br>" +
+     "Estación meteorológica: " + weatherstationname + "<br>" +
+     "Identificador OWM: " + weatherstationid + "<br>" +
+     "Ubicación: " + weatherlocation_lon + ", " + weatherlocation_lat);           
+
+
+    },
+    error: function() {
+      alert("Error recibiendo los datos desde openweathermap");
+    }
+  });       
+  
+ 
+
+});
+//la función de obtención del json termina aquí
+
+//la función popup termina aquí
+}
+
+//popup
+mymap.on('click', onMapClick);
+</script>
+
+</body>
+</html>
