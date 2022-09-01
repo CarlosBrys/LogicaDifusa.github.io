@@ -10,8 +10,11 @@
 //
   function EtiquetaTemperatura(temperatura) {
     txt = '';
-    if (temperatura >0 && temperatura <20){ txt = 'Frio';}
-    if (temperatura >=20 && temperatura <40){ txt = 'Calor';}
+    if (temperatura <0){ txt = 'Muy Frío';}
+    if (temperatura >=0 && temperatura <=10){ txt = 'Frío';}
+    if (temperatura >=10 && temperatura <=20){ txt = 'Templado';}
+    if (temperatura >=20 && temperatura <=25){ txt = 'Cálido';}
+    if (temperatura >25){ txt = 'Muy Cálido';}
     return(txt);
   }
 
@@ -19,6 +22,10 @@
 //------------
   function EtiquetaHumedad(humedad) {
     txt = '';
+    if (humedad >=0 && humedad <=25){ txt = 'Muy Seco';}
+    if (humedad >=20 && humedad <=50){ txt = 'Seco';}
+    if (humedad >=30 && humedad <=75){ txt = 'Húmedo';}
+    if (humedad >=60 && humedad <=100){ txt = 'Saturado';}
         return(txt);
   }
 
