@@ -120,6 +120,8 @@ if (direccionViento > 348.75 &&  direccionViento <= 11.25) {
     } else {
         txt =  " - no hay datos - ";
     }
+    
+      return(txt);
  }
 
 
