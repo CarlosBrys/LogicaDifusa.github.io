@@ -83,7 +83,7 @@
 // Direccion del Viento: 0 - 360º
 // Etiquetas: Rosa de los vientos
 //------------
-  function EtiquetaDireccionViento(direccionViento) {
+  function EtiquetaDirViento(direccionViento) {
     txt = '';
 if (direccionViento > 348.75 &&  direccionViento <= 11.25) {
         txt =  "N";
