@@ -80,7 +80,7 @@
     return(txt);
   }
 
-// Nubosidad
+// Nubosidad 0 a 100 %
 // Etiquetas: Despejado, Nubes dispersas, Cubierto
 //------------
   function EtiquetaNubes(nubosidad) {
