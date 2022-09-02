@@ -80,6 +80,21 @@
     return(txt);
   }
 
+
+
+// Nubosidad 0 a 100 %
+// Etiquetas: Despejado, Nubes dispersas, Cubierto
+//------------
+  function EtiquetaNubes(nubosidad) {
+    txt = '';
+    if (nubosidad <30 ){ txt = 'Despejado';}
+    if (nubosidad >=20 && nubosidad <=70){ txt = 'Nubes dispersas';}
+    if (nubosidad >60 ){ txt = 'Cubierto';}
+    return(txt);
+  }
+
+
+
 // Direccion del Viento: 0 - 360º
 // Etiquetas: Rosa de los vientos
 //------------
@@ -124,17 +139,6 @@ if (direccionViento > 348.75 &&  direccionViento <= 11.25) {
       return(txt);
  }
 
-
-// Nubosidad 0 a 100 %
-// Etiquetas: Despejado, Nubes dispersas, Cubierto
-//------------
-  function EtiquetaNubes(nubosidad) {
-    txt = '';
-    if (nubosidad <30 ){ txt = 'Despejado';}
-    if (nubosidad >=20 && nubosidad <=70){ txt = 'Nubes dispersas';}
-    if (nubosidad >60 ){ txt = 'Cubierto';}
-    return(txt);
-  }
 
 // Predicción
 // Reglas:
