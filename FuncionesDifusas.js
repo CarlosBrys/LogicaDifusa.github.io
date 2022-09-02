@@ -10,13 +10,13 @@
 //
   function EtiquetaTemperatura(temperatura) {
     txt = '';
-    if (temperatura >=-90 && temperatura <=-30){ txt = 'Gélido';}
-    if (temperatura >=-40 && temperatura <=00){ txt = 'Muy Frío';}
-    if (temperatura >=-10 && temperatura <=10){ txt = 'Frío';}
-    if (temperatura >=0 && temperatura <=20){ txt = 'Templado';}
-    if (temperatura >=10 && temperatura <=30){ txt = 'Caluroso';}
-    if (temperatura >=20 && temperatura <=40){ txt = 'Muy Caluroso';}
-    if (temperatura >=30 && temperatura <=60){ txt = 'Calor Extremo';}
+    if (temperatura >-90 && temperatura <=-30){ txt = 'Gélido';}
+    if (temperatura >-40 && temperatura <=00){ txt = 'Muy Frío';}
+    if (temperatura >-10 && temperatura <=10){ txt = 'Frío';}
+    if (temperatura >0 && temperatura <=20){ txt = 'Templado';}
+    if (temperatura >10 && temperatura <=30){ txt = 'Caluroso';}
+    if (temperatura >20 && temperatura <=40){ txt = 'Muy Caluroso';}
+    if (temperatura >30 && temperatura <=60){ txt = 'Calor Extremo';}
     return(txt);
   }
 
