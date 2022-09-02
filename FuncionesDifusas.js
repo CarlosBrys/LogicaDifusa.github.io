@@ -80,7 +80,7 @@
     return(txt);
   }
 
-// Direccion del Viendo
+// Direccion del Viento: 0 - 360º
 // Etiquetas: Rosa de los vientos
 //------------
   function EtiquetaDireccionViento(direccionViento) {
@@ -119,7 +119,7 @@ if (direccionViento > 348.75 &&  direccionViento <= 11.25) {
         txt =  "NNO";
     } else {
         txt =  " - no hay datos - ";
-    };
+    }
  }
 
 
