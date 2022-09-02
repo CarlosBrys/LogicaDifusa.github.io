@@ -80,6 +80,49 @@
     return(txt);
   }
 
+// Direccion del Viendo
+// Etiquetas: Rosa de los vientos
+//------------
+  function EtiquetaDireccionViento(direccionViento) {
+    txt = '';
+if (direccionViento > 348.75 &&  direccionViento <= 11.25) {
+        txt =  "N";
+    } else if (direccionViento > 11.25 &&  direccionViento <= 33.75) {
+        txt =  "NNE";
+    } else if (direccionViento > 33.75 &&  direccionViento <= 56.25) {
+        txt =  "NE";
+    } else if (direccionViento > 56.25 &&  direccionViento <= 78.75) {
+        txt =  "ENE";
+    } else if (direccionViento > 78.75 &&  direccionViento <= 101.25) {
+        txt =  "E";
+    } else if (direccionViento > 101.25 &&  direccionViento <= 123.75) {
+        txt =  "ESE";
+    } else if (direccionViento > 123.75 &&  direccionViento <= 146.25) {
+        txt =  "SE";
+    } else if (direccionViento > 146.25 &&  direccionViento <= 168.75) {
+        txt =  "SSE";
+    } else if (direccionViento > 168.75 &&  direccionViento <= 191.25) {
+        txt =  "S";
+    } else if (direccionViento > 191.25 &&  direccionViento <= 213.75) {
+        txt =  "SSO";
+    } else if (direccionViento > 213.75 &&  direccionViento <= 236.25) {
+        txt =  "SO";
+    } else if (direccionViento > 236.25 &&  direccionViento <= 258.75) {
+        txt =  "OSO";
+    } else if (direccionViento > 258.75 &&  direccionViento <= 281.25) {
+        txt =  "O";
+    } else if (direccionViento > 281.25 &&  direccionViento <= 303.75) {
+        txt =  "ONO";
+    } else if (direccionViento > 303.75 &&  direccionViento <= 326.25) {
+        txt =  "NO";
+    } else if (direccionViento > 326.25 &&  direccionViento <= 348.75) {
+        txt =  "NNO";
+    } else {
+        txt =  " - no hay datos - ";
+    };
+ }
+
+
 // Nubosidad 0 a 100 %
 // Etiquetas: Despejado, Nubes dispersas, Cubierto
 //------------
