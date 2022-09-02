@@ -39,8 +39,8 @@
   function EtiquetaPresion(presion) {
     txt = '';
     if (presion >=850 && presion <=1016){ txt = 'Baja';}
-    if (presion >=1016 && presion <=1182){ txt = 'Media';}
-    if (presion >=1182 && presion <=1100){ txt = 'Alta';}
+    if (presion >=1016 && presion <=1082){ txt = 'Media';}
+    if (presion >=1082 && presion <=1100){ txt = 'Alta';}
     return(txt);
   }
 
@@ -82,23 +82,10 @@
 
 
 
-// Nubosidad 0 a 100 %
-// Etiquetas: Despejado, Nubes dispersas, Cubierto
-//------------
-  function EtiquetaNubes(nubosidad) {
-    txt = '';
-    if (nubosidad <30 ){ txt = 'Despejado';}
-    if (nubosidad >=20 && nubosidad <=70){ txt = 'Nubes dispersas';}
-    if (nubosidad >60 ){ txt = 'Cubierto';}
-    return(txt);
-  }
-
-
-
 // Direccion del Viento: 0 - 360º
 // Etiquetas: Rosa de los vientos
 //------------
-  function EtiquetaDirViento(direccionViento) {
+  function EtiquetaDireccion(direccionViento) {
     txt = '';
 if (direccionViento > 348.75 &&  direccionViento <= 11.25) {
         txt =  "N";
@@ -138,6 +125,19 @@ if (direccionViento > 348.75 &&  direccionViento <= 11.25) {
     
       return(txt);
  }
+
+
+// Nubosidad 0 a 100 %
+// Etiquetas: Despejado, Nubes dispersas, Cubierto
+//------------
+  function EtiquetaNubes(nubosidad) {
+    txt = '';
+    if (nubosidad <30 ){ txt = 'Despejado';}
+    if (nubosidad >=20 && nubosidad <=70){ txt = 'Nubes dispersas';}
+    if (nubosidad >60 ){ txt = 'Cubierto';}
+    return(txt);
+  }
+
 
 
 // Predicción
