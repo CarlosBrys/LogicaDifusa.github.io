@@ -48,19 +48,19 @@
 //---------------------
 // Escala de Beaufort
 // Km/h	    Denominacion
-// 0 a 1	    Calma
-// 2 a 5	    Ventolina
-// 6 a 11	    Brisa muy débil
-// 12 a 19	  Brisa Ligera
-// 20 a 28	  Brisa moderada
-// 29 a 38	  Brisa fresca
-// 39 a 49	  Brisa fuerte
-// 50 a 61	  Viento fuerte
-// 62 a 74	  Viento duro
-// 75 a 88	  Viento muy duro
-// 89 a 102	  Temporal
-// 103 a 117	Borrasca
-// + 118	    Huracán
+// 00-01		Calmo
+// 0.5-5		Ventolina 
+// 4.5-11		Brisa suave 
+// 10.5-19		Brisa débil 
+// 17.5-28		Brisa moderada 
+// 25-38		Brisa regular 
+// 36-49		Viento fuerte
+// 45-61		Viento muy fuerte
+// 58-74		Temporal
+// 70-88		Temporal fuerte
+// 86-102		Temporal muy fuerte
+// 100-118	Tempestad
+// +115 a más	Vientos Huracanados
 //
   function EtiquetaViento(VelocidadViento) {
     txt = '';
