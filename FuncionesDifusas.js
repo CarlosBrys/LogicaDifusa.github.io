@@ -5,7 +5,7 @@
 
 // Temperatura
 //------------
-// Etiquetas:
+// Etiquetas: Muy frío(<0), frío(0-10), templado(10-20), cálido(20-25), muy cálido(>25)
 // Ux=[-90,55]
 //
   function EtiquetaTemperatura(temperatura) {
@@ -19,6 +19,7 @@
   }
 
 // Humedad
+// Etiquetas: (Muy seco (0-25), seco (20-50), húmedo(30-75), saturado (60-100)
 //------------
   function EtiquetaHumedad(humedad) {
     txt = '';
@@ -26,14 +27,18 @@
     if (humedad >=20 && humedad <=50){ txt = 'Seco';}
     if (humedad >=30 && humedad <=75){ txt = 'Húmedo';}
     if (humedad >=60 && humedad <=100){ txt = 'Saturado';}
-        return(txt);
+    return(txt);
   }
 
 // Presion
+// Etiquetas: (Baja (850-1016) Media((1016-1182) Alta (1182-1100)
 //------------
   function EtiquetaPresion(presion) {
     txt = '';
-        return(txt);
+    if (presion >=850 && presion <=1016){ txt = 'Baja';}
+    if (presion >=1016 && presion <=1182){ txt = 'Media';}
+    if (presion >=1182 && presion <=1100){ txt = 'Alta';}
+    return(txt);
   }
 
 // Velocidad del Viento
@@ -42,7 +47,7 @@
 // Km/h	    Denominacion
 // 0 a 1	    Calma
 // 2 a 5	    Ventolina
-// 6 a 11	  Brisa muy débil
+// 6 a 11	    Brisa muy débil
 // 12 a 19	  Brisa Ligera
 // 20 a 28	  Brisa moderada
 // 29 a 38	  Brisa fresca
@@ -50,13 +55,26 @@
 // 50 a 61	  Viento fuerte
 // 62 a 74	  Viento duro
 // 75 a 88	  Viento muy duro
-// 89 a 102	Temporal
+// 89 a 102	  Temporal
 // 103 a 117	Borrasca
 // + 118	    Huracán
 //
-  function EtiquetaViento(velocidadViento) {
-        txt = '';
-        return(txt);
+  function EtiquetaViento(VelocidadViento) {
+    txt = '';
+    if (VelocidadViento >=0 && VelocidadViento <2){ txt = 'Calma';}
+    if (VelocidadViento >=2 && VelocidadViento <6){ txt = 'Ventolina';}
+    if (VelocidadViento >=6 && VelocidadViento <12){ txt = 'Brisa muy débil';}
+    if (VelocidadViento >=12 && VelocidadViento <20){ txt = 'Brisa ligera';}
+    if (VelocidadViento >=20 && VelocidadViento <29){ txt = 'Brisa moderada';}
+    if (VelocidadViento >=29 && VelocidadViento <39){ txt = 'Brisa fresca';}
+    if (VelocidadViento >=39 && VelocidadViento <50){ txt = 'Brisa fuerte';}
+    if (VelocidadViento >=50 && VelocidadViento <62){ txt = 'Viento fuerte';}
+    if (VelocidadViento >=62 && VelocidadViento <75){ txt = 'Viento duro';}
+    if (VelocidadViento >=75 && VelocidadViento <89){ txt = 'Viento muy duro';}
+    if (VelocidadViento >=89 && VelocidadViento <103){ txt = 'Temporal';}
+    if (VelocidadViento >=103 && VelocidadViento <118){ txt = 'Borrasca';}
+    if (VelocidadViento >118){ txt = 'Huracán';}
+    return(txt);
   }
 
 
