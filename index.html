@@ -3,44 +3,48 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"/>
+<meta http-equiv="Pragma" content="no-cache"/>
+<meta http-equiv="Expires" content="0"/>
+<meta name="referrer" content="unsafe-url">    
+<meta name="author"   content="Dirección de Modernización de la Gestión y Gobierno Electrónico" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
 <title>Información Mateorológica Caracterizada con Lógica Difusa</title>
 
+<link rel="shortcut icon" type="image/x-icon" href="img/favicon.ico" />
 <link type="text/css" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.8.0/leaflet.css" />
+<link rel="stylesheet" href="https://unpkg.com/leaflet-responsive-popup@1.0.0/leaflet.responsive.popup.css" />
+
 <style>
-  html,
-  body {
-      width: 100%;
-      height: 100%;
-      margin: 0;
-      padding: 0;
-  }
-
-  #map {
-      height: 100%;
-      width: 100vw;
-      position: absolute;
-      top: 0;
-      bottom: 0;
-      right: 0;
-      left: 0;
-  }
+    html,
+    body {
+        width: 100%;
+        height: 100%;
+        margin: 0;
+        padding: 0;
+    }
 </style>
-
-<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.8.0/leaflet.js"></script>
-<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.1/jquery.min.js"></script>
-
-
-<script type="text/javascript" src="https://cdn.rawgit.com/CarlosBrys/LogicaDifusa/main/FuncionesDifusas.js"></script>
-
+<style>
+    #map {
+        height: 100%;
+        width: 100vw;
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        right: 0;
+        left: 0;
+    }
+</style>
 
 </head>
 
-
 <body>
 
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.8.0/leaflet.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.1/jquery.min.js"></script>
+    <script src="https://unpkg.com/leaflet-responsive-popup@1.0.0/leaflet.responsive.popup.js"></script>
 
 <div id="map" class="map"></div>
-
 
 <script>
 
@@ -49,7 +53,7 @@
 // Misiones
 var latitud = -26.883;
 var longitud = -54.437;
-var zoom = 8;
+var zoom = 7;
 var mymap = L.map('map', {
     center: [-26.883, -54.437],
     zoom: zoom,
@@ -62,15 +66,13 @@ var osm = L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png',
     attribution: '&copy; Colaboradores de <a href="http://osm.org/copyright" target = "_blank">OpenStreetMap</a>'
 }).addTo(mymap);
 
-
-
 var popup = L.popup();
 
 //popup function
 function onMapClick(e) {
     popup
         .setLatLng(e.latlng)
-        .setContent("Usted hizo clic en el mapa en " + e.latlng.toString()) 
+        .setContent('<img  src="img/cargando.gif"/>'+'Analizando...') 
         .openOn(mymap);
 
 
@@ -81,10 +83,10 @@ $(document).ready(function(){
     dataType: 'json',
     success: function(data) {
       // almacena los datos en variables json
-      weatherlocation_lon = data.coord.lon; // lon WGS84
-      weatherlocation_lat = data.coord.lat; // lat WGS84
-      weatherstationname = data.name // Name of Weatherstation
-      weatherstationid = data.id // ID of Weatherstation
+      longitudEstacion = data.coord.lon; // lon WGS84
+      latitudEstacion = data.coord.lat; // lat WGS84
+      nombreEstacion = data.name // Name of Weatherstation
+      IDEstacion = data.id // ID of Weatherstation
       weathertime = data.dt // Time of weatherdata (UTC)
       temperatura = data.main.temp; // Kelvin
       presion = data.main.pressure; // hPa
@@ -92,12 +94,15 @@ $(document).ready(function(){
       temperatura_min = data.main.temp_min; // Kelvin
       temperatura_max = data.main.temp_max; // Kelvin
       velocidadViento = data.wind.speed; // Meter per second
+      rafagasViento = data.wind.gust; // Meter per second
       direccionViento = data.wind.deg; // Wind from direction x degree from north
       nubosidad = data.clouds.all; // nubosidad in %
       weatherconditionid = data.weather[0].id // ID
       weatherconditionstring = data.weather[0].main // Weatheartype
-      descripcionClima = data.weather[0].description // Weatherdescription
-      weatherconditionicon = data.weather[0].icon // ID of weathericon
+      estadoActual = data.weather[0].description
+      descripcionClima = estadoActual.replace(/\b\w/g, c => c.toUpperCase());
+      iconoClima = data.weather[0].icon // ID of weathericon
+
 
     // Convierte el tiempo Unix UTC
     var utctimecalc = new Date(weathertime * 1000);
@@ -111,79 +116,107 @@ $(document).ready(function(){
     var time = date + '.' + month + '.' + year + ' ' + hour + ':' + min + ' Uhr';
 
     
-
     // recálculo
-    var weathercondtioniconhtml = "http://openweathermap.org/img/w/" + weatherconditionicon + ".png";
+    var icono = "http://openweathermap.org/img/w/" + iconoClima + ".png";
     var weathertimenormal = time; // reallocate time var....
     var temperaturacelsius = Math.round((temperatura - 273) * 100) / 100;  // Converting Kelvin to Celsius
     var velocidadVientoNudos = Math.round((velocidadViento * 1.94) * 100) / 100; // velocidadViento from m/s in Knots; Round to 2 decimals
     var velocidadVientoKmh = Math.round((velocidadViento * 3.6) * 100) / 100; // velocidadViento from m/s in km/h; Round to 2 decimals
-    var direccionVientostring = "Im the wind from direction"; // Wind from direction x as text
-    if (direccionViento > 348.75 &&  direccionViento <= 11.25) {
-        direccionVientostring =  "N";
-    } else if (direccionViento > 11.25 &&  direccionViento <= 33.75) {
-        direccionVientostring =  "NNE";
-    } else if (direccionViento > 33.75 &&  direccionViento <= 56.25) {
-        direccionVientostring =  "NE";
-    } else if (direccionViento > 56.25 &&  direccionViento <= 78.75) {
-        direccionVientostring =  "ENE";
-    } else if (direccionViento > 78.75 &&  direccionViento <= 101.25) {
-        direccionVientostring =  "E";
-    } else if (direccionViento > 101.25 &&  direccionViento <= 123.75) {
-        direccionVientostring =  "ESE";
-    } else if (direccionViento > 123.75 &&  direccionViento <= 146.25) {
-        direccionVientostring =  "SE";
-    } else if (direccionViento > 146.25 &&  direccionViento <= 168.75) {
-        direccionVientostring =  "SSE";
-    } else if (direccionViento > 168.75 &&  direccionViento <= 191.25) {
-        direccionVientostring =  "S";
-    } else if (direccionViento > 191.25 &&  direccionViento <= 213.75) {
-        direccionVientostring =  "SSO";
-    } else if (direccionViento > 213.75 &&  direccionViento <= 236.25) {
-        direccionVientostring =  "SO";
-    } else if (direccionViento > 236.25 &&  direccionViento <= 258.75) {
-        direccionVientostring =  "OSO";
-    } else if (direccionViento > 258.75 &&  direccionViento <= 281.25) {
-        direccionVientostring =  "O";
-    } else if (direccionViento > 281.25 &&  direccionViento <= 303.75) {
-        direccionVientostring =  "ONO";
-    } else if (direccionViento > 303.75 &&  direccionViento <= 326.25) {
-        direccionVientostring =  "NO";
-    } else if (direccionViento > 326.25 &&  direccionViento <= 348.75) {
-        direccionVientostring =  "NNO";
-    } else {
-        direccionVientostring =  " - currently no winddata available - ";
-    };
+    var velocidadRagafasVientoKmh = Math.round((rafagasViento * 3.6) * 100) / 100; // velocidadViento from m/s in km/h; Round to 2 decimals
 
+      // Llamadas a las funciones de logica difusa para obtener las etiquetas linguisticas
 
-  ///////////////////////////////////////////////////////
-  // Funciones difusas para las etiquetas linguisticas //
-  ///////////////////////////////////////////////////////
-      TextoTemperatura = EtiquetaTemperatura(temperaturacelsius);
-      // TextoTemperatura = EtiquetaHumedad(humedad);
-      // TextoPresion = EtiquetaPresion(presion);
-      // TextoViento = EtiquetaViento(velocidadViento);
-      // TextoTemperatura = EtiquetaTemperatura(temperaturacelsius);
-      // TextoTemperatura = EtiquetaTemperatura(temperaturacelsius);
+      var TextoTemperatura = TextoHumedad = TextoPresion = TextoViento = TextoDirViento = TextoNube = '';
 
+      var TextoTemperatura = EtiquetaTemperatura(temperaturacelsius);
+      var TextoHumedad = EtiquetaHumedad(humedad);
+      var TextoPresion = EtiquetaPresion(presion);
+      var TextoViento = EtiquetaViento(velocidadVientoKmh);
+      var TextoDireccionViento = EtiquetaDireccionViento(direccionViento);
+      var TextoNube = EtiquetaNubes(nubosidad);
       
+     
+      // Si no se informa la velocidad de las rafagas, asumir sin datos
+      if ( typeof rafagasViento === 'undefined') {
+            velocidadRagafasVientoKmh = 0; 
+            TextoRafagasViento="Sin datos";
+        }else{ 
+            var TextoRafagasViento = EtiquetaViento(velocidadRagafasVientoKmh);
+        }   
 
-//Popup with content
-    var fontsizesmall = 1;
-    popup.setContent("Datos del Tiempo:<br>" + "<img src=" + weathercondtioniconhtml + "><br>" +
-     descripcionClima + "<br>" +
-     "Temperatura: " + temperaturacelsius + "°C" + "<b> [ " + TextoTemperatura + " ]</b><br>" +
-     "Presión: " + presion + " hPa" + "<br>" +
-     "Humedad: " + humedad + "%" + "<br>" +
-     "Nubosidad: " + nubosidad + "%" + "<br>" +
-     "Velocidad del viento: " + velocidadVientoKmh + " Km/h" + "<br>" +
-     "Vientos desde el: " + direccionVientostring + " (" + direccionViento + "°)" + "<br>" +
-     "<font size=" + fontsizesmall + ">Datos de:<br>openweathermap.org<br>Medidos el: " + weathertimenormal + "<br>" +
-     "Estación meteorológica: " + weatherstationname + "<br>" +
-     "Identificador OWM: " + weatherstationid + "<br>" +
-     "Ubicación: " + weatherlocation_lon + ", " + weatherlocation_lat);           
+// Reglas de predicción:
+var min = 0;
+var Pronostico = "Sin pronóstico";
+
+// Si la presión atmosférica es alta. Buen clima.
+if ((presion >= 1000 && presion <= 1100)  ) {
+    var min = 1;
+    var Pronostico  = "Buen tiempo";
+}
+
+// Si la presión atmosférica es muy baja. Temporal.
+if ((presion >= 850 && presion <= 860)  ) {
+    var min = 1;
+    var Pronostico  = "Temporal";
+}
+
+// Si la presión atmosférica es alta y la temperatura y la humedad bajas, el tiempo debe seguir estable. 
+if ((presion >= 940 && presion <= 1100) && (temperatura >= -5 && temperatura <= 15) && (humedad >= 0 && humedad <= 35)) {
+    var PertenenciaPresion = PertenenciaTrapezoidalDerecha(presion, 940, 1100);
+    var PertenenciaTemperatura = PertenenciaTrapezoidalIzquierda(temperatura, -5, 15);
+    var PertenenciaHumedad = PertenenciaTrapezoidalIzquierda(humedad, 0, 35);
+    var min = Math.min(PertenenciaPresion, PertenenciaTemperatura, PertenenciaHumedad);
+    var Pronostico  = "Estable";
+}
+
+// Si la presión atmosférica es baja, y la temperatura templada o baja y la  humedad relativa es baja, hay que esperar lluvias.
+if ((presion >= 850 && presion <= 930) && (temperatura >= -5 && temperatura <= 35) && (humedad >= 0 && humedad <= 35)) {
+    var PertenenciaPresion = PertenenciaTrapezoidalIzquierda(presion, 850, 930);
+    var PertenenciaTemperatura = PertenenciaTrapezoidalIzquierda(temperatura, -5, 35);
+    var PertenenciaHumedad = PertenenciaTrapezoidalIzquierda(humedad, 0, 35);
+    var min = Math.min(PertenenciaPresion, PertenenciaTemperatura, PertenenciaHumedad);
+    var Pronostico  = "Lluvia";
+}
+
+// Si la presión atmosférica es baja, y la temperatura templada o baja y la  humedad relativa es alta, hay que esperar tormentas.
+if ((presion >= 850 && presion <= 930) && (temperatura >= -5 && temperatura <= 35) && (humedad >= 60 && humedad <= 100)) {
+    var PertenenciaPresion = PertenenciaTrapezoidalIzquierda(presion, 850, 930);
+    var PertenenciaTemperatura = PertenenciaTrapezoidalIzquierda(temperatura, -5, 35);
+    var PertenenciaHumedad = PertenenciaTrapezoidalDerecha(humedad, 60, 100);
+    var min = Math.min(PertenenciaPresion, PertenenciaTemperatura, PertenenciaHumedad);
+    var Pronostico  = "Tormentas";
+}
 
 
+
+      URL= '<a target=_blank  href="https://openweathermap.org">OpenWeatherMap</a>';
+    var TextoPopup = 
+        "Ubicación: " + latitudEstacion + ", " + longitudEstacion  + "<br>" +
+        "<img src=" + icono + ">" +  
+        descripcionClima + "<br>" +
+        "Temperatura: " + temperaturacelsius + "°C" + "<b> [ " + TextoTemperatura + " ]</b>" + "<br>" +
+        "Presión: " + presion + " hPa" + "<b> [ " + TextoPresion + " ]</b>" + "<br>" +
+        "Humedad: " + humedad + "%" + "<b> [ " + TextoHumedad + " ]</b>" + "<br>" +
+        "Nubosidad: " + nubosidad + "%" + "<b> [ " + TextoNube + " ]</b>" + "<br>" +
+        "Velocidad del viento: " + velocidadVientoKmh + " Km/h" + "<b> [ " + TextoViento + " ]</b>" + "<br>" +
+        "Ráfagas de viento: " + velocidadRagafasVientoKmh + " Km/h" + "<b> [ " + TextoRafagasViento + " ]</b>" + "<br>" +
+        "Vientos desde el: " + "<b> [ " + TextoDireccionViento + " ]</b>" + " (" + direccionViento + "°)" + "<br>" +
+        "Pronóstico: " + "<b> [ " + min*100 + "% " +  Pronostico + " ]</b>" + "<br>" +
+        "<br>Datos de :" + URL + "<br>" +
+        "Medidos el: " + weathertimenormal + "<br>" +
+        "Estación meteorológica: <b>" + nombreEstacion + "</b><br>" +
+        "Identificador OWM: " + IDEstacion;
+     
+    $.getJSON("https://nominatim.openstreetmap.org/reverse?format=json&addressdetails=0&zoom=18&lat=" + e.latlng.lat + "&lon=" + e.latlng.lng + "&json_callback=?" ,                          
+                    function (response) {
+			Lugar = response.display_name;
+            popup.setContent(
+                "Lugar: <b>" + Lugar + "</b><br>" + 
+                TextoPopup 
+                );
+
+                    }
+                ); 
     },
     error: function() {
       alert("Error recibiendo los datos desde openweathermap");
@@ -200,6 +233,183 @@ $(document).ready(function(){
 
 //popup
 mymap.on('click', onMapClick);
+
+///////////////////////////////////////////////////////
+// Funciones difusas para las etiquetas linguisticas //
+///////////////////////////////////////////////////////
+
+
+// Temperatura
+//------------
+function EtiquetaTemperatura(temperatura) {
+const  Etiqueta = ['Gélido', 'Muy Frío', 'Frío', 'Templado', 'Caluroso',  'Muy Caluroso', 'Carlor Extremo'];
+const  Pertenencias =  [];
+var x = temperatura;
+Pertenencias[0] = PertenenciaTriangular(x, -90, -60, -30); // Gelido
+Pertenencias[1] = PertenenciaTriangular(x, -40, -20, 0); //
+Pertenencias[2] = PertenenciaTriangular(x, -5, 5, 15); //
+Pertenencias[3] = PertenenciaTriangular(x, 10, 22.5, 35); //
+Pertenencias[4] = PertenenciaTriangular(x, 30, 35, 40); //
+Pertenencias[5] = PertenenciaTriangular(x, 35, 40, 45); //
+Pertenencias[6] = PertenenciaTriangular(x, 40, 50, 60); // Calor Extremo
+var TextoEtiqueta = Etiqueta[Pertenencias.indexOf(Math.max(...Pertenencias))]  // Muestra la etiqueta que está en la posición del mayor elemento de la lista
+return(TextoEtiqueta);
+}
+
+
+// Humedad
+//------------
+function EtiquetaHumedad(humedad) {
+const  Etiqueta = ['Muy Seco', 'Seco', 'Húmedo', 'Saturado'];
+const  Pertenencias =  [];
+var x = humedad;    
+Pertenencias[0] = PertenenciaTriangular(x,  0, 12.5, 25); // 
+Pertenencias[1] = PertenenciaTriangular(x, 20, 32.5, 50); //
+Pertenencias[2] = PertenenciaTriangular(x, 30, 42.4, 75); //
+Pertenencias[3] = PertenenciaTriangular(x, 60, 72.5, 101); //
+var TextoEtiqueta = Etiqueta[Pertenencias.indexOf(Math.max(...Pertenencias))]  // Muestra la etiqueta que está en la posición del mayor elemento de la lista
+return(TextoEtiqueta);
+}
+
+
+// Presion
+//------------
+function EtiquetaPresion(presion) {
+const  Etiqueta = ['Muy Baja', 'Baja', 'Media', 'Alta', 'Muy Alta'];
+const  Pertenencias =  [];
+var x = presion;    
+Pertenencias[0] = PertenenciaTriangular(x, 850, 875, 900); // 
+Pertenencias[1] = PertenenciaTriangular(x, 880, 155, 950); //
+Pertenencias[2] = PertenenciaTriangular(x, 930, 965, 1000); //
+Pertenencias[3] = PertenenciaTriangular(x, 980, 10155, 1050); //
+Pertenencias[4] = PertenenciaTriangular(x, 1030, 1065, 1100); //
+var TextoEtiqueta = Etiqueta[Pertenencias.indexOf(Math.max(...Pertenencias))]  // Muestra la etiqueta que está en la posición del mayor elemento de la lista
+return(TextoEtiqueta);
+}
+
+
+// Viento
+//------------
+function EtiquetaViento(VelocidadViento) {
+const  Etiqueta = ['Calmo', 'Ventolina', 'Brisa suave',  'Brisa débil',  'Brisa moderada',  'Brisa regular',  'Viento fuerte', 'Viento muy fuerte', 'Temporal', 
+'Temporal fuerte', 'Temporal muy fuerte', 'Tempestad', 'Vientos Huracanados'];const  Pertenencias =  [];
+var x = VelocidadViento;  
+Pertenencias[ 0] = PertenenciaTriangular(x,    0,  0.5,   1); // Calmo
+Pertenencias[ 1] = PertenenciaTriangular(x,  0.5,  2.75,  5); //  Ventolina
+Pertenencias[ 2] = PertenenciaTriangular(x,  4.5,  7.75,  11); // Brisa suave
+Pertenencias[ 3] = PertenenciaTriangular(x, 10.5,  14.75, 19); // Brisa débil
+Pertenencias[ 4] = PertenenciaTriangular(x, 17.5,  22.5,  28); // Brisa moderada
+Pertenencias[ 5] = PertenenciaTriangular(x, 25  ,  31.5,  38); // Brisa regular
+Pertenencias[ 6] = PertenenciaTriangular(x, 36  ,  42.5,  49); // Viento fuerte
+Pertenencias[ 7] = PertenenciaTriangular(x, 45  ,  53,    61); // Viento muy fuerte
+Pertenencias[ 8] = PertenenciaTriangular(x, 58  ,  66,    74); // Temporal
+Pertenencias[ 9] = PertenenciaTriangular(x, 70  ,  79,    88); // Temporal fuerte
+Pertenencias[10] = PertenenciaTriangular(x, 86  ,  94,   102); // Temporal muy fuerte
+Pertenencias[11] = PertenenciaTriangular(x, 100 , 109,   118); // Tempestad
+Pertenencias[12] = PertenenciaTriangular(x, 115 , 300,   500); // Vientos Huracanados	
+var TextoEtiqueta = Etiqueta[Pertenencias.indexOf(Math.max(...Pertenencias))]  // Muestra la etiqueta que está en la posición del mayor elemento de la lista
+return(TextoEtiqueta);
+}
+
+
+
+function EtiquetaNubes(nubosidad) {
+const  Etiqueta = ['Despejado', 'Nubes dispersas', 'Cubierto'];
+const  Pertenencias =  [];
+var x = nubosidad;    
+Pertenencias[0] = PertenenciaTriangular(x,  0, 16, 33); // 
+Pertenencias[1] = PertenenciaTriangular(x, 20, 43,   66); //
+Pertenencias[2] = PertenenciaTriangular(x, 50, 75,  101); //
+console.log(Pertenencias[0], Pertenencias[1], Pertenencias[2]);
+var TextoEtiqueta = Etiqueta[Pertenencias.indexOf(Math.max(...Pertenencias))]  // Muestra la etiqueta que está en la posición del mayor elemento de la lista
+return(TextoEtiqueta);
+}
+
+// Direccion del Viento
+//----------------------
+  function EtiquetaDireccionViento(direccionViento) {
+    txt = '';
+if (direccionViento > 348.75 &&  direccionViento <= 11.25) {
+        txt =  "N";
+    } else if (direccionViento > 11.25 &&  direccionViento <= 33.75) {
+        txt =  "NNE";
+    } else if (direccionViento > 33.75 &&  direccionViento <= 56.25) {
+        txt =  "NE";
+    } else if (direccionViento > 56.25 &&  direccionViento <= 78.75) {
+        txt =  "ENE";
+    } else if (direccionViento > 78.75 &&  direccionViento <= 101.25) {
+        txt =  "E";
+    } else if (direccionViento > 101.25 &&  direccionViento <= 123.75) {
+        txt =  "ESE";
+    } else if (direccionViento > 123.75 &&  direccionViento <= 146.25) {
+        txt =  "SE";
+    } else if (direccionViento > 146.25 &&  direccionViento <= 168.75) {
+        txt =  "SSE";
+    } else if (direccionViento > 168.75 &&  direccionViento <= 191.25) {
+        txt =  "S";
+    } else if (direccionViento > 191.25 &&  direccionViento <= 213.75) {
+        txt =  "SSO";
+    } else if (direccionViento > 213.75 &&  direccionViento <= 236.25) {
+        txt =  "SO";
+    } else if (direccionViento > 236.25 &&  direccionViento <= 258.75) {
+        txt =  "OSO";
+    } else if (direccionViento > 258.75 &&  direccionViento <= 281.25) {
+        txt =  "O";
+    } else if (direccionViento > 281.25 &&  direccionViento <= 303.75) {
+        txt =  "ONO";
+    } else if (direccionViento > 303.75 &&  direccionViento <= 326.25) {
+        txt =  "NO";
+    } else if (direccionViento > 326.25 &&  direccionViento <= 348.75) {
+        txt =  "NNO";
+    } else {
+        txt =  " - no hay datos - ";
+    }
+      return(txt);
+ }
+
+
+ // Pertenencia triangular
+function PertenenciaTriangular(x, a, b, c) {
+    var pertenencia = 0;
+    if (x < a || x > c) {
+        pertenencia = 0;
+    }
+    if (x >= a && x <= b) {
+        pertenencia = (x - a) / (b - a);
+    }
+    if (x > b && x <= c) {
+        pertenencia = (c - x) / (c - b);
+    }
+    return pertenencia;
+}
+
+
+// Pertenencia trapezoidal derecha
+function PertenenciaTrapezoidalDerecha(x, a, b) {
+    var pertenencia = 0;
+    if (x < a) {
+        pertenencia = 0;
+    }
+    if (x >= a && x < b) {
+        pertenencia = (x - a) / (b - a);
+    }
+    if (x >= b) {
+        pertenencia = 1;
+    }
+    return pertenencia;
+}
+// Pertenencia trapezoidal izquierda
+function PertenenciaTrapezoidalIzquierda(x, a, b) {
+    var pertenencia = 0;
+    if (x < a)
+        pertenencia = 1;
+    if (x >= a && x < b)
+        pertenencia = 1 - ((x - a) / (b - a));
+    if (x >= b)
+        pertenencia = 0;
+    return pertenencia;
+}
+
 </script>
 
 </body>
